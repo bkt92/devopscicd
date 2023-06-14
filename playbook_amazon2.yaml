@@ -1,0 +1,28 @@
+- name: Deyploy the predictor api to EC2 server
+  hosts: apiserver   
+  become: True
+  vars:
+#    MODEL_CONFIG_PATH: /home/ec2-user/model_config/all_model.yaml
+    user_home: /home/ec2-user
+    server_home: /home/ec2-user
+  tasks:
+    - name: Install docker on amazon linux 2
+      ansible.builtin.yum:
+        name: docker
+        state: present
+
+    - name: Start docker service
+      service:
+        name: docker
+        state: started
+
+    - name: Enable docker service
+      service:
+         name: docker
+         enabled: yes
+
+    - name: Starting Docker Containers
+      docker_container:
+        name: nginx
+        image: nginx:latest
+        state: started

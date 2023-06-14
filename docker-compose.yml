@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  nginx-1:
+    build:
+      context: ./hello-nginx
+      dockerfile: ./hello-nginx/Dockerfile
+    image: "nginx-hello"
+    ports:
+      - "80:80"
+    #volumes:
+    #  - ".:/usr/share/nginx/html"
+
