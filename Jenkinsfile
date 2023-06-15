@@ -8,7 +8,7 @@ pipeline {
     stage('Build Docker Image') 
     {
     steps {
-            sh "docker build -t bkt92/hello-nginx ./hello-nginx"        
+            sh "docker build -t bkt92/hello-nginx:dev ./hello-nginx"        
         }
     }
 
