@@ -36,6 +36,12 @@ variable "public_subnets_cidr" {
   description = "CIDR block for Public Subnet"
 }
 
+variable "iam_managed_policy_arns" {
+  type        = list(string)
+  description = "IAM managed policies to be attached to ec2 role"
+  default     = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+}
+
 # Create VPC
 resource "aws_vpc" "main_vpc" {
   cidr_block = var.vpc_cidr
@@ -54,7 +60,7 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public subnet 1"
+    Name = "public subnet"
   }
 }
 
@@ -77,7 +83,7 @@ data "aws_ami" "amazon-linux-2" {
 
 #Internet gateway
 resource "aws_internet_gateway" "ig" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.main_vpc.id
   tags = {
     "Name"        = "default-igw"
   }
@@ -85,7 +91,7 @@ resource "aws_internet_gateway" "ig" {
 
 # route table for public subnets
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.main_vpc.id
   tags = {
     Name        = "public-route-table"
   }
@@ -98,60 +104,71 @@ resource "aws_route" "public_internet_gateway" {
   gateway_id             = aws_internet_gateway.ig.id
 }
 
+# Route table associations for both Public subnet
+resource "aws_route_table_association" "public" {
+  count          = length(var.public_subnets_cidr)
+  subnet_id      = element(aws_subnet.public_subnet.*.id, count.index)
+  route_table_id = aws_route_table.public.id
+}
+
 # 4 EC@
 resource "aws_instance" "PublicEC2-subnet-1-1" {
   ami           = data.aws_ami.amazon-linux-2.id
   instance_type = "t2.micro"
   key_name = "sshdemokey"
+  iam_instance_profile = aws_iam_instance_profile.access_ec2_terminal.name
   tags = {
     Name = "PublicEC2-1-1"
   }
-  subnet_id = aws_subnet.public_subnet.1.id
-  vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  depends_on = [aws_vpc.demovpc, aws_subnet.public_subnet]
+  subnet_id = aws_subnet.public_subnet.0.id
+  vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
+  depends_on = [aws_vpc.main_vpc, aws_subnet.public_subnet]
 }
 
 resource "aws_instance" "PublicEC2-subnet-1-2" {
   ami           = data.aws_ami.amazon-linux-2.id
   instance_type = "t2.micro"
   key_name = "sshdemokey"
+  iam_instance_profile = aws_iam_instance_profile.access_ec2_terminal.name
   tags = {
-    Name = "PublicEC2-1-1"
+    Name = "PublicEC2-1-2"
   }
-  subnet_id = aws_subnet.public_subnet.1.id
-  vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  depends_on = [aws_vpc.demovpc, aws_subnet.public_subnet]
+  subnet_id = aws_subnet.public_subnet.0.id
+  vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
+  depends_on = [aws_vpc.main_vpc, aws_subnet.public_subnet]
 }
 
 resource "aws_instance" "PublicEC2-subnet-2-1" {
   ami           = data.aws_ami.amazon-linux-2.id
   instance_type = "t2.micro"
+  iam_instance_profile = aws_iam_instance_profile.access_ec2_terminal.name
   key_name = "sshdemokey"
   tags = {
-    Name = "PublicEC2-1-1"
+    Name = "PublicEC2-2-1"
   }
-  subnet_id = aws_subnet.public_subnet.2.id
-  vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  depends_on = [aws_vpc.demovpc, aws_subnet.public_subnet]
+  subnet_id = aws_subnet.public_subnet.1.id
+  vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
+  depends_on = [aws_vpc.main_vpc, aws_subnet.public_subnet]
 }
 
 resource "aws_instance" "PublicEC2-subnet-2-2" {
   ami           = data.aws_ami.amazon-linux-2.id
   instance_type = "t2.micro"
+  iam_instance_profile = aws_iam_instance_profile.access_ec2_terminal.name
   key_name = "sshdemokey"
   tags = {
-    Name = "PublicEC2-1-1"
+    Name = "PublicEC2-2-2"
   }
-  subnet_id = aws_subnet.public_subnet.2.id
+  subnet_id = aws_subnet.public_subnet.1.id
   vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
-  depends_on = [aws_vpc.demovpc, aws_subnet.public_subnet]
+  depends_on = [aws_vpc.main_vpc, aws_subnet.public_subnet]
 }
 
 # Security group
 resource "aws_security_group" "allow_http_ssh" {
   name        = "allow_http_ssh"
   description = "Allow TLS SSH inbound traffic"
-  vpc_id      = var.vpc_id
+  vpc_id      = aws_vpc.main_vpc.id
 
   ingress {
     description = "TLS from VPC"

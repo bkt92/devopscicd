@@ -1,10 +1,9 @@
-- name: Deyploy the predictor api to EC2 server
-  hosts: apiserver   
+- name: Install docker and docker compose on the remote server
+  hosts: server
   become: True
   vars:
-#    MODEL_CONFIG_PATH: /home/ec2-user/model_config/all_model.yaml
-    user_home: /home/ec2-user
-    server_home: /home/ec2-user
+    user_home: /home/ubuntu
+    server_home: /home/ubuntu
   tasks:
     - name: Install aptitude
       apt:
@@ -37,7 +36,7 @@
 
     - name: Update apt and install docker-ce
       apt:
-        name: 
+        name:
           - docker-ce
           - docker-compose-plugin
         state: latest
@@ -52,11 +51,3 @@
       service:
          name: docker
          enabled: yes
-
-    - name: Copy docker-compose.yaml to server
-      copy:
-        src:  docker-compose.yaml
-        dest: "{{ server_home }}"
-
-    - name: Run the server
-      command: docker-compose up

@@ -3,8 +3,8 @@ services:
   nginx-1:
     build:
       context: ./hello-nginx
-      dockerfile: ./hello-nginx/Dockerfile
-    image: "nginx-hello"
+      dockerfile: Dockerfile
+    image: "bkt92/nginx-hello"
     ports:
       - "80:80"
     #volumes:
