@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_AUTH = credentials('docker_hun_credential')
+    }
 
     stages {
     stage('Build Docker Image') 
@@ -11,9 +14,7 @@ pipeline {
 
     stage('Push Docker Image') {
         steps{
-            withCredentials([string(credentialsId: 'docker_hun_credential', variable: 'DOCKER_HUB_CREDENTIALS')]) {
-              sh "docker login -u bkt92 -p ${DOCKER_HUB_CREDENTIALS}"
-          }
+              sh "docker login -u $DOCKER_AUTH_USR -p $DOCKER_AUTH_PSW"
        sh "docker push bkt92/hello-nginx"
         }
     }
