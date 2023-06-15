@@ -25,6 +25,6 @@
     - name: Starting Docker Containers
       docker_container:
         name: nginx
-        image: bkt92/nginx-hello
+        image: bkt92/hello-nginx
         published_ports: 80:80
         state: started
