@@ -1,6 +1,7 @@
 pipeline {
     agent any
 
+    stages {
     stage('Build Docker Image') {
             echo 'docker'
             sh "docker compose up"          
@@ -12,5 +13,6 @@ pipeline {
               sh "docker login -u bkt92 -p ${DOCKER_HUB_CREDENTIALS}"
           }
        sh "docker push bkt92/hello-nginx"
+        }
     }
 }
