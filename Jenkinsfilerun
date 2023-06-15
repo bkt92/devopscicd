@@ -1,0 +1,15 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Install Docker and run nginx Amazone Linux 2') {
+            steps {
+                ansiblePlaybook(
+                playbook: 'playbook_amazon2.yaml',
+                hostKeyChecking: 'false',
+                inventoryContent: 'hosts.ini',
+                credentialsId: 'sshdemokey')
+            }
+        }
+    }
+}
