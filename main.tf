@@ -45,7 +45,6 @@ variable "iam_managed_policy_arns" {
 # Create VPC
 resource "aws_vpc" "main_vpc" {
   cidr_block = var.vpc_cidr
-
   tags = {
     Name = "main-vpc"
   }
@@ -90,16 +89,16 @@ resource "aws_internet_gateway" "ig" {
 }
 
 # route table for public subnets
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main_vpc.id
-  tags = {
-    Name        = "public-route-table"
-  }
-}
+#resource "aws_route_table" "public" {
+#  vpc_id = aws_vpc.main_vpc.id
+#  tags = {
+#    Name        = "public-route-table"
+#  }
+#}
 
 #route table
 resource "aws_route" "public_internet_gateway" {
-  route_table_id         = aws_route_table.public.id
+  route_table_id         = aws_vpc.main_vpc.default_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.ig.id
 }
@@ -108,7 +107,7 @@ resource "aws_route" "public_internet_gateway" {
 resource "aws_route_table_association" "public" {
   count          = length(var.public_subnets_cidr)
   subnet_id      = element(aws_subnet.public_subnet.*.id, count.index)
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_vpc.main_vpc.default_route_table_id
 }
 
 # 4 EC@
