@@ -14,7 +14,7 @@ pipeline {
 
     stage('Push Docker Image') {
         steps{
-              sh "docker login -u $DOCKER_AUTH_USR -p $DOCKER_AUTH_PSW"
+              sh 'docker login -u $DOCKER_AUTH_USR --password-stdin $DOCKER_AUTH_PSW'
        sh "docker push bkt92/hello-nginx"
         }
     }
