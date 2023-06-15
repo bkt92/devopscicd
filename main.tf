@@ -238,3 +238,9 @@ resource "aws_iam_instance_profile" "access_ec2_terminal" {
   name = "access_ec2_terminal"
   role = aws_iam_role.access_ec2_terminal.name
 }
+
+# Get output Ips
+output "ec2_public_ips" {
+  value = [aws_instance.PublicEC2-subnet-1-1.public_ip, aws_instance.PublicEC2-subnet-1-2.public_ip, aws_instance.PublicEC2-subnet-2-1.public_ip,
+		aws_instance.PublicEC2-subnet-2-2.public_ip]
+}
