@@ -3,9 +3,11 @@ pipeline {
 
     stages {
     stage('Build Docker Image') 
+    {
     steps {
             sh "docker compose up"          
         }
+    }
 
     stage('Push Docker Image') {
         steps{
