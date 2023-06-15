@@ -5,7 +5,7 @@ pipeline {
     stage('Build Docker Image') 
     {
     steps {
-            sh "docker compose up"          
+            sh "docker build -t bkt92/hello-nginx ./hello-nginx"        
         }
     }
 
