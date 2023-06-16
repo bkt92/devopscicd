@@ -8,14 +8,15 @@ pipeline {
     stage('Build Docker Image') 
     {
     steps {
-            sh "docker build -t bkt92/hello-nginx:master ./hello-nginx"        
+            sh "docker build -t bkt92/hello-nginx:master -t bkt92/hello-nginx:master-${BUILD_NUMBER} ./hello-nginx"        
         }
     }
 
     stage('Push Docker Image') {
         steps{
               sh 'docker login -u $DOCKER_AUTH_USR -p $DOCKER_AUTH_PSW'
-       sh "docker push bkt92/hello-nginx:master"
+			  sh "docker push bkt92/hello-nginx:master"
+			  sh "docker push bkt92/hello-nginx:master-${BUILD_NUMBER}"
         }
     }
     }
